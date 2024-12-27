@@ -3,6 +3,25 @@ import { HttpTypes } from "@medusajs/types"
 import { UseMutationOptions, useMutation } from "@tanstack/react-query"
 import { sdk } from "../../lib/client"
 
+export const useSignInClerk = (
+  options?: UseMutationOptions<
+    | string
+    | {
+        location: string
+      },
+    FetchError,
+    { authToken: string }
+  >
+) => {
+  return useMutation({
+    mutationFn: (payload) => sdk.auth.login("user", "clerk-auth", payload),
+    onSuccess: async (data, variables, context) => {
+      options?.onSuccess?.(data, variables, context)
+    },
+    ...options,
+  })
+}
+
 export const useSignInWithEmailPass = (
   options?: UseMutationOptions<
     | string

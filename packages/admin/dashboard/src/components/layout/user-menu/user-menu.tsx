@@ -1,3 +1,8 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useLocation } from "react-router-dom";
+
+import { useClerk } from "@clerk/clerk-react"
 import {
   BookOpen,
   CircleHalfSolid,
@@ -10,25 +15,21 @@ import {
 } from "@medusajs/icons"
 import {
   Avatar,
+  clx,
   DropdownMenu,
   Heading,
   IconButton,
   Input,
   Kbd,
   Text,
-  clx,
 } from "@medusajs/ui"
 import * as Dialog from "@radix-ui/react-dialog"
-import { useTranslation } from "react-i18next"
 
-import { Skeleton } from "../../common/skeleton"
-
-import { useState } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
-import { useLogout, useMe } from "../../../hooks/api"
-import { queryClient } from "../../../lib/query-client"
-import { useGlobalShortcuts } from "../../../providers/keybind-provider/hooks"
-import { useTheme } from "../../../providers/theme-provider"
+import { useLogout, useMe } from "../../../hooks/api";
+import { queryClient } from "../../../lib/query-client";
+import { useGlobalShortcuts } from "../../../providers/keybind-provider/hooks";
+import { useTheme } from "../../../providers/theme-provider";
+import { Skeleton } from "../../common/skeleton";
 
 export const UserMenu = () => {
   const { t } = useTranslation()
@@ -189,18 +190,19 @@ const ThemeToggle = () => {
 
 const Logout = () => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
-
+  const { signOut } = useClerk()
   const { mutateAsync: logoutMutation } = useLogout()
 
   const handleLogout = async () => {
     await logoutMutation(undefined, {
-      onSuccess: () => {
+      onSuccess: async () => {
         /**
          * When the user logs out, we want to clear the query cache
          */
         queryClient.clear()
-        navigate("/login")
+        await signOut({
+          redirectUrl: "/app/login",
+        })
       },
     })
   }

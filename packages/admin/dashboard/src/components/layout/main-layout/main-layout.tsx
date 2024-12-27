@@ -17,14 +17,14 @@ import {
 import { Avatar, DropdownMenu, Text, clx } from "@medusajs/ui"
 import * as Collapsible from "@radix-ui/react-collapsible"
 import { useTranslation } from "react-i18next"
-
+import { useClerk } from "@clerk/clerk-react"
 import { useStore } from "../../../hooks/api/store"
 import { Divider } from "../../common/divider"
 import { Skeleton } from "../../common/skeleton"
 import { INavItem, NavItem } from "../../layout/nav-item"
 import { Shell } from "../../layout/shell"
 
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { useDashboardExtension } from "../../../extensions"
 import { useLogout } from "../../../hooks/api"
 import { queryClient } from "../../../lib/query-client"
@@ -66,18 +66,20 @@ const MainSidebar = () => {
 
 const Logout = () => {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const { signOut } = useClerk()
 
   const { mutateAsync: logoutMutation } = useLogout()
 
   const handleLogout = async () => {
     await logoutMutation(undefined, {
-      onSuccess: () => {
+      onSuccess: async () => {
         /**
          * When the user logs out, we want to clear the query cache
          */
         queryClient.clear()
-        navigate("/login")
+        await signOut({
+          redirectUrl: "/app/login",
+        })
       },
     })
   }

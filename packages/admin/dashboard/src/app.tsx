@@ -1,3 +1,5 @@
+import { ClerkProvider } from "@clerk/clerk-react"
+
 import { DashboardExtensionManager } from "./extensions"
 import { Providers } from "./providers/providers"
 import { RouterProvider } from "./providers/router-provider"
@@ -18,9 +20,11 @@ function App() {
   })
 
   return (
-    <Providers api={manager.api}>
-      <RouterProvider />
-    </Providers>
+    <ClerkProvider publishableKey="pk_test_YWRhcHRlZC1yb29zdGVyLTQuY2xlcmsuYWNjb3VudHMuZGV2JA">
+      <Providers api={manager.api}>
+        <RouterProvider />
+      </Providers>
+    </ClerkProvider>
   )
 }
 
